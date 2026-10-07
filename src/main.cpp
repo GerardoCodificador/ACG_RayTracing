@@ -17,6 +17,8 @@
 
 #include "shaders/intersectionshader.h"
 #include "shaders/depthshader.h"
+#include "shaders/normalshader.h"
+#include "shaders/whiteshader.h"
 
 
 #include "materials/phong.h"
@@ -197,9 +199,11 @@ void PaintImage(Film* film)
 
         for (size_t col = 0; col < resX; col++)
         { 
-            //CHANGE...()
-            Vector3D random_color = Vector3D((double)rand() / RAND_MAX, (double)rand() / RAND_MAX, (double)rand() / RAND_MAX);            
-            film->setPixelValue(col,lin, random_color);
+            //TASK 1
+            float colr = (float)col / resX;
+            float colg = (float)lin / resY;
+            Vector3D GradientColor = Vector3D((float)colr, (float)colg, 0);
+            film->setPixelValue(col,lin, GradientColor);
            
         }
     }
@@ -218,11 +222,13 @@ int main()
 
     // Declare the shader
     Vector3D bgColor(0.0, 0.0, 0.0); // Background color (for rays which do not intersect anything)
-    Vector3D intersectionColor(1,0,0);
+    Vector3D intersectionColor(1,1,1);
     
     //First Assignment
     Shader *shader = new IntersectionShader (intersectionColor, bgColor);
-    //Shader *depthshader = new DepthShader (intersectionColor,7.5f, bgColor);
+    Shader *depthshader = new DepthShader (intersectionColor,7.5f, bgColor);
+	Shader* normalshader = new NormalShader(intersectionColor, 7.5f, bgColor);
+	Shader* whittedshader = new WhiteShader(intersectionColor,7.5f,bgColor);
     //(... normal, whitted) ...
 
   
@@ -233,17 +239,17 @@ int main()
     Camera* cam;
     Scene myScene;
     //Create Scene Geometry and Illumiantion
-    buildSceneSphere(cam, film, myScene); //Task 2,3,4;
-    //buildSceneCornellBox(cam, film, myScene); //Task 5
+    //buildSceneSphere(cam, film, myScene); //Task 2,3,4;
+    buildSceneCornellBox(cam, film, myScene); //Task 5
 
     //---------------------------------------------------------------------------
 
     //Paint Image ONLY TASK 1
-    PaintImage(film);
+    //PaintImage(film);
 
     // Launch some rays! TASK 2,3,...   
     auto start = high_resolution_clock::now();
-    //raytrace(cam, shader, film, myScene.objectsList, myScene.LightSourceList);
+    raytrace(cam, whittedshader, film, myScene.objectsList, myScene.LightSourceList);
     auto stop = high_resolution_clock::now();
 
     
