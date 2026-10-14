@@ -3,11 +3,13 @@
 
 #include "material.h"
 
+// Perfect specular transmitter (e.g. glass). Like Mirror it has no BRDF lobe:
+// the integrator bends the ray using the ratio of refractive indices.
 class Transmissive : public Material
 {
 public:
     Transmissive();
-    Transmissive(float ut);
+    Transmissive(double mu_t);
     Vector3D getReflectance(const Vector3D& n, const Vector3D& wo,
         const Vector3D& wi)const ;
 
@@ -20,8 +22,6 @@ public:
 
 
 private:
-    float Ut;
-    
-
+    double mu_t;  // eta1 / eta2, ratio of refractive indices (outside / inside)
 };
-#endif // MATERIAL
+#endif // TRANSMISSIVEMATERIAL

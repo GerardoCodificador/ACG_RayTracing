@@ -51,7 +51,24 @@ Vector3D WhittedIntegrator::computeColor(const Ray &r, const std::vector<Shape*>
 		return computeColor(reflected, objList, lsList);
 	}
 	else if (material.hasTransmission()) {
-		Vector3D wt = material.getReflectance(normal, wo, Vector3D(0));
+		double mu = material.getIndexOfRefraction();
+		double cosO = dot(normal, wo);
+		// Normals point outwards: if wo is on the inside we are leaving the
+		// object, so flip the normal and invert the index ratio (eta2 -> eta1)
+		if (cosO < 0.0) {
+			normal = -normal;
+			mu = 1.0 / mu;
+			cosO = -cosO;
+		}
+
+		double radicand = 1.0 - mu * mu * (1.0 - cosO * cosO);
+		Vector3D wt;
+		if (radicand < 0.0)
+			// Total internal reflection: no refracted ray exists, so it reflects
+			wt = Utils::computeReflectionDirection(r.d, normal);
+		else
+			wt = -wo * mu + normal * (mu * cosO - std::sqrt(radicand));  // Eq. 8
+
 		Ray refracted(its.itsPoint, wt, r.depth + 1);
 		return computeColor(refracted, objList, lsList);
 	}
