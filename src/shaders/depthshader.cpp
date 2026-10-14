@@ -19,7 +19,8 @@ Vector3D DepthShader::computeColor(const Ray &r, const std::vector<Shape*> &objL
 	if (Utils::getClosestIntersection(r, objList,its))
 	{
 		float dist = (its.itsPoint - r.o).length();
-		Vector3D intersectionColor = color*Vector3D(0, std::fmax((1-dist/maxDist), 0),0);
+		// Eq. 2: fade the hit colour linearly to black at maxDist
+		Vector3D intersectionColor = color * std::fmax(1.0 - dist / maxDist, 0.0);
 		return intersectionColor;
 	}
     //else...

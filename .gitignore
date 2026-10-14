@@ -1,0 +1,11 @@
+build/
+.vs/
+output.bmp
+output.exr
+*.zip
+.DS_Store
+# Course handouts, kept locally only
+Lab_Docs/
+# Report sources and tooling, kept locally only (only the PDF and figures are shared)
+reports/**/*.typ
+reports/**/tools/

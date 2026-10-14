@@ -3,6 +3,8 @@
 
 #include "material.h"
 
+// Perfect specular reflector. It has no BRDF lobe of its own: the integrator
+// follows the reflection direction and returns whatever light arrives along it.
 class Mirror : public Material
 {
 public:
@@ -15,17 +17,5 @@ public:
     bool hasTransmission() const { return false; }
     bool hasDiffuseOrGlossy() const { return false; }
     bool isEmissive() const { return false; }
-
-    double getIndexOfRefraction() const;
-    Vector3D getEmissiveRadiance() const;
-    Vector3D getDiffuseReflectance() const;
-
-
-private:
-    Vector3D rho_d;
-    Vector3D Ks;
-    float    alpha;
-    
-
 };
-#endif // MATERIAL
+#endif // MIRRORMATERIAL

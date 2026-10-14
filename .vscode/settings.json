@@ -1,0 +1,9 @@
+{
+  "cmake.buildDirectory": "${workspaceFolder}/build",
+  "cmake.configureSettings": { "CMAKE_EXPORT_COMPILE_COMMANDS": "ON" },
+  "clangd.arguments": ["--compile-commands-dir=${workspaceFolder}/build"],
+  // Keep upstream formatting so course updates merge cleanly
+  "editor.formatOnSave": false,
+  "editor.formatOnPaste": false,
+  "editor.formatOnType": false
+}

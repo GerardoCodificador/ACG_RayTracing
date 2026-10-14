@@ -13,13 +13,11 @@ Vector3D Phong::getReflectance(const Vector3D& n, const Vector3D& wo,
     const Vector3D& wi) const {
 
     //FILL(...)
-	float prodescal = n.x * wi.x + n.y * wi.y + n.z * wi.z;
-	Vector3D reflectionDirection = 2 * prodescal * n - wi;
-	prodescal = reflectionDirection.x * wo.x + reflectionDirection.y * wo.y + reflectionDirection.z * wo.z;
-	prodescal = std::pow(prodescal, alpha);
-	return rho_d/std::numbers::pi + Ks * prodescal;
-
-    return Vector3D(0.0);
+	// Ideal reflection of wi about n (Eq. 5)
+	Vector3D wr = n * (2.0 * dot(n, wi)) - wi;
+	// Clamp so directions past 90 degrees from wr add no highlight (and pow never sees a negative base)
+	double specular = std::pow(std::fmax(dot(wo, wr), 0.0), alpha);
+	return rho_d / std::numbers::pi + Ks * specular;
 
 };
 

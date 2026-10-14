@@ -86,8 +86,7 @@ Vector3D Utils::scalarToRGB(double scalar)
 
 Vector3D Utils::computeReflectionDirection(const Vector3D &Direction, const Vector3D &normal)
 {
-    // Compute the perfect reflection direction FILL(...) [OPTIONAL]
-    Vector3D wr;
-    return wr;
+    // Mirror the incoming direction about the normal (Eq. 5 with wi = -Direction)
+    return Direction - normal * (2.0 * dot(normal, Direction));
 }
 
