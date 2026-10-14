@@ -224,12 +224,12 @@ int main()
 
     // Declare the shader
     Vector3D bgColor(0.0, 0.0, 0.0); // Background color (for rays which do not intersect anything)
-    Vector3D intersectionColor(1,1,1);
+    Vector3D intersectionColor(1,0,0);
     
     //First Assignment
     Shader *shader = new IntersectionShader (intersectionColor, bgColor);
-    Shader *depthshader = new DepthShader (intersectionColor,7.5f, bgColor);
-	Shader* normalshader = new NormalShader(intersectionColor, 7.5f, bgColor);
+    Shader *depthshader = new DepthShader (Vector3D(0,1,0), 7.5, bgColor);
+	Shader* normalshader = new NormalShader(bgColor);
 	Shader* whittedshader = new WhittedIntegrator(bgColor, 0.1, 10);
     //(... normal, whitted) ...
 
