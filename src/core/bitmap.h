@@ -2,6 +2,9 @@
 #define BITMAP_H
 
 #include "vector3d.h"
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
 //#include <iostream>
 
 /**
@@ -11,10 +14,10 @@ struct bmp24_file_header
 {
     char      magic1;    // 'B'
     char      magic2;    // 'M'
-    long      size;      // 0
+    int32_t      size;      // 0
     short int reserved1; // 0
     short int reserved2; // 0
-    long      offbits;   // 14 + 40
+    int32_t      offbits;   // 14 + 40
                          // (info header size) + (fileheader size)
 
     /**
@@ -50,17 +53,17 @@ struct bmp24_file_header
  */
 struct bmp24_info_header
 {
-    long	  size;             // 40 (size of the info header block in bytes)
-    long	  width;            // img.width
-    long	  height;           // img.height
+    int32_t	  size;             // 40 (size of the info header block in bytes)
+    int32_t	  width;            // img.width
+    int32_t	  height;           // img.height
     short int planes;           // 1
     short int bit_count;        // 24
-    long	  compression;      // 0
-    long      size_image;       // (img.width * 3 + extra_bytes) * img.height
-    long	  x_pels_per_meter; // 2952
-    long	  y_pels_per_meter; // 2952
-    long	  clr_used;         // 0
-    long	  clr_important;    // 0
+    int32_t	  compression;      // 0
+    int32_t      size_image;       // (img.width * 3 + extra_bytes) * img.height
+    int32_t	  x_pels_per_meter; // 2952
+    int32_t	  y_pels_per_meter; // 2952
+    int32_t	  clr_used;         // 0
+    int32_t	  clr_important;    // 0
 
     /**
      * @brief bmp24_info_header
@@ -72,8 +75,8 @@ struct bmp24_info_header
                                    y_pels_per_meter(2952), clr_used(0),
                                    clr_important(0)
     {
-        width  = (long) width_;
-        height = (long) height_;
+        width  = (int32_t) width_;
+        height = (int32_t) height_;
 
         int extra_bytes = (4 - (width * 3) % 4) % 4;
         size_image = (width * 3 + extra_bytes) * height;
@@ -83,17 +86,17 @@ struct bmp24_info_header
     {
         char *block = (char *)malloc(40);
 
-        memcpy((void*)&block[0],  &size,   sizeof(long));
-        memcpy((void*)&block[4],  &width,  sizeof(long));
-        memcpy((void*)&block[8],  &height, sizeof(long));
+        memcpy((void*)&block[0],  &size,   sizeof(int32_t));
+        memcpy((void*)&block[4],  &width,  sizeof(int32_t));
+        memcpy((void*)&block[8],  &height, sizeof(int32_t));
         memcpy((void*)&block[12], &planes, sizeof(short int));
         memcpy((void*)&block[14], &bit_count,   sizeof(short int));
-        memcpy((void*)&block[16], &compression, sizeof(long));
-        memcpy((void*)&block[20], &size_image,  sizeof(long));
-        memcpy((void*)&block[24], &x_pels_per_meter, sizeof(long));
-        memcpy((void*)&block[28], &y_pels_per_meter, sizeof(long));
-        memcpy((void*)&block[32], &clr_used,         sizeof(long));
-        memcpy((void*)&block[36], &clr_important,    sizeof(long));
+        memcpy((void*)&block[16], &compression, sizeof(int32_t));
+        memcpy((void*)&block[20], &size_image,  sizeof(int32_t));
+        memcpy((void*)&block[24], &x_pels_per_meter, sizeof(int32_t));
+        memcpy((void*)&block[28], &y_pels_per_meter, sizeof(int32_t));
+        memcpy((void*)&block[32], &clr_used,         sizeof(int32_t));
+        memcpy((void*)&block[36], &clr_important,    sizeof(int32_t));
 
         return block;
     }
