@@ -45,7 +45,8 @@ Vector3D WhittedIntegrator::computeColor(const Ray &r, const std::vector<Shape*>
 		return color;
 	}
 	else if (material.hasSpecular()) {
-		Vector3D wr = material.getReflectance(normal, wo, Vector3D(0));
+		// Perfect mirror: the colour is whatever arrives from the reflected direction
+		Vector3D wr = Utils::computeReflectionDirection(r.d, normal);
 		Ray reflected(its.itsPoint, wr, r.depth + 1);
 		return computeColor(reflected, objList, lsList);
 	}
