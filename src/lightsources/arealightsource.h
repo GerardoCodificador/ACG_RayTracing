@@ -17,16 +17,7 @@ public:
     Vector3D sampleLightPosition() const ;
 
     double getArea() const {
-        Vector3D square_dim = myAreaLightsource->v1 + myAreaLightsource->v2;
-        if (square_dim.x <= Epsilon) {
-            return square_dim.y * square_dim.z;
-        }
-        if (square_dim.y <= Epsilon) {
-            return square_dim.x * square_dim.z;
-        }
-        if (square_dim.z <= Epsilon) {
-            return square_dim.x * square_dim.y;
-        }
+        return cross(myAreaLightsource->v1, myAreaLightsource->v2).length();
     }
 
     Vector3D getNormal() const {

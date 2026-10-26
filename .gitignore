@@ -1,4 +1,4 @@
-build/
+build*/
 .vs/
 output.bmp
 output.exr
