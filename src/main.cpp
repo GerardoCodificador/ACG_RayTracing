@@ -22,6 +22,7 @@
 #include "shaders/hemisphericaldirectintegrator.h"
 #include "shaders/areadirectintegrator.h"
 #include "shaders/pathtracingintegrator.h"
+#include "shaders/neeintegrator.h"
 
 
 #include "materials/phong.h"
@@ -37,7 +38,7 @@ typedef std::chrono::duration<double, std::milli> durationMs;
 
 
 void buildSceneCornellBox(Camera*& cam, Film*& film,
-    Scene myScene)
+    Scene myScene, bool phongOnly = false)
 {
     /* **************************** */
 /* Declare and place the camera */
@@ -94,9 +95,9 @@ void buildSceneCornellBox(Camera*& cam, Film*& film,
 
     Matrix4x4 sphereTransform2;
     sphereTransform2 = Matrix4x4::translate(Vector3D(-1.5, -offset + 3*radius, 4));
-    Shape* s2 = new Sphere(radius, sphereTransform2, transmissive);
+    Shape* s2 = new Sphere(radius, sphereTransform2, phongOnly ? blueGlossy_80 : transmissive);
 
-    Shape* square = new Square(Vector3D(offset + 0.999, -offset-0.2, 3.0), Vector3D(0.0, 4.0, 0.0), Vector3D(0.0, 0.0, 2.0), Vector3D(-1.0, 0.0, 0.0), mirror);
+    Shape* square = new Square(Vector3D(offset + 0.999, -offset-0.2, 3.0), Vector3D(0.0, 4.0, 0.0), Vector3D(0.0, 0.0, 2.0), Vector3D(-1.0, 0.0, 0.0), phongOnly ? cyandiffuse : mirror);
 
     myScene.AddObject(s1);
     myScene.AddObject(s2);
@@ -245,6 +246,7 @@ int main()
     Shader* hemisphericalshader = new HemisphericalDirectIntegrator(bgColor, 0.1, 10);
     Shader* areashader = new AreaDirectIntegrator(bgColor, 0.1, 10);
     Shader* pathtracingshader = new PathTracingIntegrator(bgColor, 5);
+    Shader* neeshader = new NEEIntegrator(bgColor, 5);
     //(... normal, whitted) ...
 
   
@@ -256,7 +258,7 @@ int main()
     Scene myScene;
     //Create Scene Geometry and Illumiantion
     //buildSceneSphere(cam, film, myScene); //Task 2,3,4;
-    buildSceneCornellBox(cam, film, myScene); //Task 5
+    buildSceneCornellBox(cam, film, myScene, true); //Task 5 (true = Phong materials only)
 
     //---------------------------------------------------------------------------
 
@@ -266,7 +268,7 @@ int main()
     // Launch some rays! TASK 2,3,...   
     auto start = high_resolution_clock::now();
     unsigned int spp = 256; // samples per pixel
-    raytrace(cam, pathtracingshader, film, myScene.objectsList, myScene.LightSourceList, spp);
+    raytrace(cam, neeshader, film, myScene.objectsList, myScene.LightSourceList, spp);
     auto stop = high_resolution_clock::now();
 
     
