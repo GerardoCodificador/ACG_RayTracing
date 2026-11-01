@@ -21,6 +21,7 @@
 #include "shaders/whittedintegrator.h"
 #include "shaders/hemisphericaldirectintegrator.h"
 #include "shaders/areadirectintegrator.h"
+#include "shaders/pathtracingintegrator.h"
 
 
 #include "materials/phong.h"
@@ -243,6 +244,7 @@ int main()
 	Shader* whittedshader = new WhittedIntegrator(bgColor, 0.1, 10);
     Shader* hemisphericalshader = new HemisphericalDirectIntegrator(bgColor, 0.1, 10);
     Shader* areashader = new AreaDirectIntegrator(bgColor, 0.1, 10);
+    Shader* pathtracingshader = new PathTracingIntegrator(bgColor, 5);
     //(... normal, whitted) ...
 
   
@@ -264,7 +266,7 @@ int main()
     // Launch some rays! TASK 2,3,...   
     auto start = high_resolution_clock::now();
     unsigned int spp = 256; // samples per pixel
-    raytrace(cam, areashader, film, myScene.objectsList, myScene.LightSourceList, spp);
+    raytrace(cam, pathtracingshader, film, myScene.objectsList, myScene.LightSourceList, spp);
     auto stop = high_resolution_clock::now();
 
     
