@@ -258,7 +258,7 @@ int main()
     Scene myScene;
     //Create Scene Geometry and Illumiantion
     //buildSceneSphere(cam, film, myScene); //Task 2,3,4;
-    buildSceneCornellBox(cam, film, myScene, true); //Task 5 (true = Phong materials only)
+    buildSceneCornellBox(cam, film, myScene, false); //Task 5 (true = Phong materials only)
 
     //---------------------------------------------------------------------------
 

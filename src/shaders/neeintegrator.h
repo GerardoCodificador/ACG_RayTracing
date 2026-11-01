@@ -16,7 +16,7 @@ public:
                              const std::vector<LightSource*> &lsList) const;
 
 private:
-    Vector3D reflectedRadiance(const Intersection &its, const Vector3D &wo, size_t depth,
+    Vector3D reflectedRadiance(const Intersection &its, const Ray &r,
                                const std::vector<Shape*> &objList,
                                const std::vector<LightSource*> &lsList) const;
     Vector3D indirectRadiance(const Intersection &its, const Vector3D &wo, size_t depth,
