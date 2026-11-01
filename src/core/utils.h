@@ -26,6 +26,7 @@ public:
 
 
     static Vector3D computeReflectionDirection(const Vector3D &Direction, const Vector3D &normal);
+    static Vector3D computeTransmissionDirection(const Vector3D &Direction, const Vector3D &normal, double mu_t);
 
 
 

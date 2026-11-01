@@ -90,3 +90,24 @@ Vector3D Utils::computeReflectionDirection(const Vector3D &Direction, const Vect
     return Direction - normal * (2.0 * dot(normal, Direction));
 }
 
+Vector3D Utils::computeTransmissionDirection(const Vector3D &Direction, const Vector3D &normal, double mu_t)
+{
+    Vector3D n = normal;
+    Vector3D wo = -Direction;
+    double mu = mu_t;
+    double cosO = dot(n, wo);
+    // Normals point outwards: if wo is on the inside we are leaving the
+    // object, so flip the normal and invert the index ratio (eta2 -> eta1)
+    if (cosO < 0.0) {
+        n = -n;
+        mu = 1.0 / mu;
+        cosO = -cosO;
+    }
+
+    double radicand = 1.0 - mu * mu * (1.0 - cosO * cosO);
+    // Total internal reflection: no refracted ray exists, so it reflects
+    if (radicand < 0.0)
+        return computeReflectionDirection(Direction, n);
+
+    return -wo * mu + n * (mu * cosO - std::sqrt(radicand));
+}

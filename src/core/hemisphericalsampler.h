@@ -5,7 +5,7 @@
 
 using namespace std;
 
-static uint32_t s_RndState = 1; //NOTE: NOT THREAD SAFE;
+inline uint32_t s_RndState = 1; //NOTE: NOT THREAD SAFE;
 
 
 class HemisphericalSampler

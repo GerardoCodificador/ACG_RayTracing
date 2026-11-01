@@ -30,7 +30,10 @@ public:
     mutable double maxT; //
     size_t depth;        // Ray depth (or number of bounces)
 
-    //FILL(..) Extra data for Path Tracing
+    // Path tracing with NEE: should L_e be added if this ray hits a light? False after a
+    // diffuse/glossy bounce (that light was already sampled directly), true for camera rays
+    // and rays leaving a mirror or glass (light sampling cannot see through those)
+    bool countEmission = true;
 
 };
 
