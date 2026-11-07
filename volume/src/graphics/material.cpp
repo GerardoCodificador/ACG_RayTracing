@@ -53,7 +53,98 @@ WireframeMaterial::WireframeMaterial()
 	this->shader = Shader::Get("res/shaders/basic.vs", "res/shaders/flat.fs");
 }
 
+
 WireframeMaterial::~WireframeMaterial() { }
+
+VolumeMaterial::VolumeMaterial(float ac, glm::vec4& bgcol) : background_color(bgcol) // <-- Vincula la referencia aquí
+{	
+	this->noisefactor = 0.0f;
+	this->Task = 2;
+	this->stepsize = 0.01f;
+	this->absortion_coefficient = ac;
+	this->color = glm::vec4(1.f);
+	this->shader = Shader::Get("res/shaders/basic.vs", "res/shaders/volume.fs");
+	this->emitedLight = glm::vec3(0.5f, 0.2f, 0.7f);
+}
+
+
+VolumeMaterial::~VolumeMaterial() { }
+void VolumeMaterial::setUniforms(Camera* camera, glm::mat4 model, Mesh* mesh)
+{
+	// 1. Límites transformados de la caja
+	glm::vec3 localMin = mesh->aabb_min;
+	glm::vec3 localMax = mesh->aabb_max;
+
+	glm::vec3 worldMin = glm::vec3(model * glm::vec4(localMin, 1.0f));
+	glm::vec3 worldMax = glm::vec3(model * glm::vec4(localMax, 1.0f));
+
+	glm::vec3 finalMin = glm::min(worldMin, worldMax);
+	glm::vec3 finalMax = glm::max(worldMin, worldMax);
+
+	this->shader->setUniform("u_boxmin", finalMin);
+	this->shader->setUniform("u_boxmax", finalMax);
+
+	// 2. Matrices y cámara
+	this->shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+	this->shader->setUniform("u_camera_position", camera->eye);
+	this->shader->setUniform("u_model", model);
+
+	// 3. Parámetros del volumen (Asegúrate de inicializar estos valores en el constructor del material)
+	this->shader->setUniform("u_absortion_coefficient", this->absortion_coefficient);
+	this->shader->setUniform("u_background_color", this->background_color);
+
+	this->shader->setUniform("u_task", this->Task+1 );
+	this->shader->setUniform("u_step_size", this->stepsize);
+
+	this->shader->setUniform("u_emitted_color", this->emitedLight);
+	this->shader->setUniform("u_noise_factor", this->noisefactor);
+}
+
+void VolumeMaterial::render(Mesh* mesh, glm::mat4 model, Camera* camera)
+{
+	if (mesh && this->shader)
+	{
+		// 1. Activar el shader
+		this->shader->enable();
+
+		// 2. Llamar a tu función setUniforms pasando los parámetros necesarios
+		setUniforms(camera, model, mesh);
+
+		// 3. Realizar la llamada de dibujo (draw call) de la geometría auxiliar (el cubo)
+		mesh->render(GL_TRIANGLES);
+
+		// 4. Desactivar el shader
+		this->shader->disable();
+	}
+}
+
+void VolumeMaterial::renderInMenu()
+{
+	ImGui::Separator();
+	ImGui::Text("Volume Settings");
+	ImGui::Text("Material Type: %s", std::string("Volume").c_str());
+	ImGui::SliderFloat("Change absortion coefficient",&this->absortion_coefficient, 0.0f, 5.0f);
+	const char* task_items[] = {
+		"Task 1: Homogeneous Absorption",
+		"Task 2: Heterogeneous Absorption",
+		"Task 3: Emission-Absorption"
+	};
+
+	// ComboBox de ImGui vinculado a la variable 'task'
+	if (ImGui::Combo("Task Model", &this->Task, task_items, 3)) {
+		// Opcional: código que se ejecute justo al cambiar de opción
+	}
+
+	// Opcional: Mostrar controles adicionales solo cuando se seleccione la Task 3 (Emisión)
+	if (this->Task == 2) {
+
+		ImGui::ColorEdit4("EmitedLight", (float*)&emitedLight);
+	}
+	ImGui::SliderFloat("Step Size", &this->stepsize, 0.001f, 0.2f);
+	ImGui::SliderFloat("Noise Factor", &this->noisefactor, 0.0f, 10.0f);
+
+	
+}
 
 void WireframeMaterial::render(Mesh* mesh, glm::mat4 model, Camera* camera)
 {

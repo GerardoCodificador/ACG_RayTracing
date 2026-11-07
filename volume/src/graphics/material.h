@@ -34,11 +34,25 @@ public:
 
 class WireframeMaterial : public FlatMaterial {
 public:
-
 	WireframeMaterial();
 	~WireframeMaterial();
 
 	void render(Mesh* mesh, glm::mat4 model, Camera* camera);
+};
+class VolumeMaterial : public FlatMaterial {
+public:
+	int Task;
+	float stepsize;
+	float absortion_coefficient;
+	float noisefactor;
+	glm::vec4& background_color;
+	glm::vec3 emitedLight;
+	VolumeMaterial(float ac,glm::vec4& bgcol);
+	~VolumeMaterial();
+
+	void render(Mesh* mesh, glm::mat4 model, Camera* camera);
+	void renderInMenu();
+	void setUniforms(Camera* camera, glm::mat4 model, Mesh* mesh);
 };
 
 class StandardMaterial : public Material {
