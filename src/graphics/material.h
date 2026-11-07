@@ -44,6 +44,7 @@ public:
 	int Task;
 	float stepsize;
 	float absortion_coefficient;
+	float noisefactor;
 	glm::vec4& background_color;
 	glm::vec3 emitedLight;
 	VolumeMaterial(float ac,glm::vec4& bgcol);

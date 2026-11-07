@@ -57,7 +57,8 @@ WireframeMaterial::WireframeMaterial()
 WireframeMaterial::~WireframeMaterial() { }
 
 VolumeMaterial::VolumeMaterial(float ac, glm::vec4& bgcol) : background_color(bgcol) // <-- Vincula la referencia aquí
-{
+{	
+	this->noisefactor = 0.0f;
 	this->Task = 2;
 	this->stepsize = 0.01f;
 	this->absortion_coefficient = ac;
@@ -96,6 +97,7 @@ void VolumeMaterial::setUniforms(Camera* camera, glm::mat4 model, Mesh* mesh)
 	this->shader->setUniform("u_step_size", this->stepsize);
 
 	this->shader->setUniform("u_emitted_color", this->emitedLight);
+	this->shader->setUniform("u_noise_factor", this->noisefactor);
 }
 
 void VolumeMaterial::render(Mesh* mesh, glm::mat4 model, Camera* camera)
@@ -139,6 +141,7 @@ void VolumeMaterial::renderInMenu()
 		ImGui::ColorEdit4("EmitedLight", (float*)&emitedLight);
 	}
 	ImGui::SliderFloat("Step Size", &this->stepsize, 0.001f, 0.2f);
+	ImGui::SliderFloat("Noise Factor", &this->noisefactor, 0.0f, 10.0f);
 
 	
 }
