@@ -164,10 +164,11 @@ vec4 computeColorHeterogeneous(vec3 rayOrigin, vec3 rayDir, float tNear, float t
 	while(pos<=tFar ) {
 		vec3 samplePoint = rayOrigin + pos * rayDir;
 		float density = clamp(snoise(vec4(samplePoint,u_noise_factor) ),0.0,1.0); // Escalar para ajustar la frecuencia del ruido
+		accumulatedDensity+=density*u_absortion_coefficient*u_step_size;
 		pos+=u_step_size;
 	}
 	
-    transmittance = exp(-accumulatedDensity*u_absortion_coefficient);
+    transmittance = exp(-accumulatedDensity);
 	vec3 finalColor = u_background_color.rgb * transmittance;
 	float finalAlpha = u_background_color.a; // O puedes manejar la opacidad global del volumen si lo pide tu práctica
 
