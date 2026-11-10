@@ -9,3 +9,5 @@ Lab_Docs/
 # Report sources and tooling, kept locally only (only the PDF and figures are shared)
 reports/**/*.typ
 reports/**/tools/
+# Downloaded by volume/CMakeLists.txt on every configure
+volume/libraries/imguizmo/
