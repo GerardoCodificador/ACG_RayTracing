@@ -24,6 +24,7 @@ public:
 	bool flag_wireframe;
 
 	bool close = false;
+	bool flag_save_render = false; // set by the P key, handled at the end of render()
 	bool dragging;
 	glm::vec2 mousePosition;
 	glm::vec2 lastMousePosition;
@@ -35,6 +36,7 @@ public:
 	void shutdown();
 
 	void onKeyDown(int key, int scancode);
+	void saveRender();
 	void onKeyUp(int key, int scancode);
 	void onRightMouseDown();
 	void onRightMouseUp();

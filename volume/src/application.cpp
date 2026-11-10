@@ -1,4 +1,8 @@
 #include "application.h"
+#include "graphics/texture.h"
+
+#include <ctime>
+#include <filesystem>
 
 bool render_wireframe = false;
 glm::vec4 backgroundcolor;
@@ -68,10 +72,37 @@ void Application::render()
 
     // Draw the floor grid
     if (this->flag_grid) drawGrid();
+
+    // The GUI is drawn after this, so the saved image only contains the scene
+    if (this->flag_save_render) {
+        saveRender();
+        this->flag_save_render = false;
+    }
+}
+
+// Save the current frame (read back from the framebuffer) to renders/render_<date>_<time>.tga
+void Application::saveRender()
+{
+    // The viewport is the real framebuffer size, which is larger than the window on Retina screens
+    GLint viewport[4];
+    glGetIntegerv(GL_VIEWPORT, viewport);
+
+    Image image;
+    image.fromScreen(viewport[2], viewport[3]);
+
+    std::filesystem::create_directories("renders");
+    char filename[64];
+    std::time_t now = std::time(nullptr);
+    std::strftime(filename, sizeof(filename), "renders/render_%Y%m%d_%H%M%S.tga", std::localtime(&now));
+
+    if (image.saveTGA(filename))
+        std::cout << "Render saved to " << filename << std::endl;
 }
 
 void Application::renderGUI()
 {
+    ImGui::Text("Press P to save the render to renders/");
+
     if (ImGui::TreeNodeEx("Scene", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::ColorEdit4("Background Color", (float*)&backgroundcolor);
@@ -106,6 +137,9 @@ void Application::onKeyDown(int key, int scancode)
         break;
     case GLFW_KEY_R:
         Shader::ReloadAll();
+        break;
+    case GLFW_KEY_P: // save the next frame to a file
+        flag_save_render = true;
         break;
     }
 }

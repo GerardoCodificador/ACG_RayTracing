@@ -11,3 +11,4 @@ reports/**/*.typ
 reports/**/tools/
 # Downloaded by volume/CMakeLists.txt on every configure
 volume/libraries/imguizmo/
+volume/renders/
