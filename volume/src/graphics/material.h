@@ -55,6 +55,10 @@ public:
 	int vdbFileIndex = 0;     // file selected in the GUI
 	int loadedVdbIndex = -1;  // file currently in the texture (-1 = none)
 
+	// Lab 4 Task 2: in-scattering of light from the scene's light source
+	float scattering_coefficient = 10.0f; // mu_s, scaled by the density like mu_a
+	int lightSteps = 16;                  // steps of the second ray march, towards the light
+
 	VolumeMaterial(float ac,glm::vec4& bgcol);
 	~VolumeMaterial();
 

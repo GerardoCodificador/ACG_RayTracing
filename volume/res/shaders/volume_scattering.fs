@@ -22,6 +22,15 @@ uniform mat4 u_inverse_model;
 uniform vec3 u_local_boxmin;
 uniform vec3 u_local_boxmax;
 
+// Lab 4 Task 2: scattering and the light (light uniforms come from Light::setUniforms)
+uniform float u_scattering_coefficient;
+uniform int u_light_steps;
+uniform vec3 u_light_position;
+uniform vec4 u_light_color;
+uniform float u_light_intensity;
+
+const float PI = 3.14159265359;
+
 out vec4 FragColor;
 vec2 intersectAABB(vec3 rayOrigin, vec3 rayDir, vec3 boxMin, vec3 boxMax) {
     vec3 tMin = (boxMin - rayOrigin) / rayDir;
@@ -193,6 +202,65 @@ vec4 computeColorHeterogeneous(vec3 rayOrigin, vec3 rayDir, float tNear, float t
 
 	return vec4(finalColor, finalAlpha);
 }
+// Phase function: how much of the light arriving along the light direction is scattered
+// towards the viewer. cosTheta = dot(rayDir, direction to the light), so cosTheta = 1 means
+// we are looking straight at the light through the volume (forward scattering).
+// Isotropic for now: every direction gets the same share, 1 / (4 pi).
+// TODO (Lab 4 Task 3): replace with Henyey-Greenstein using a g slider.
+float phaseFunction(float cosTheta) {
+	return 1.0 / (4.0 * PI);
+}
+
+// L_i: the light that reaches point p from the light source, dimmed by the volume between
+// them. Second ray march, from p towards the light, with a fixed number of steps.
+vec3 lightRadiance(vec3 p) {
+	vec3 toLight = u_light_position - p;
+	float distToLight = length(toLight);
+	vec3 lightDir = toLight / distToLight;
+
+	// p is inside the box, so we only need the back (exit) intersection; stop at the light
+	// itself if it is inside the box
+	float tExit = min(intersectAABB(p, lightDir, u_boxmin, u_boxmax).y, distToLight);
+	float dt = tExit / float(u_light_steps);
+
+	float opticalThickness = 0.0;
+	for (int i = 0; i < u_light_steps; i++) {
+		float density = sampleDensity(p + lightDir * (float(i) + 0.5) * dt);
+		// mu_t = mu_a + mu_s: both absorption and out-scattering remove light
+		opticalThickness += density * (u_absortion_coefficient + u_scattering_coefficient) * dt;
+	}
+	return u_light_color.rgb * u_light_intensity * exp(-opticalThickness);
+}
+
+// Lab 4 Task 2, Eq. 1: L = B T(0,t) + integral of T(t',t) (mu_a L_e + mu_s L_s) dt'
+vec4 computeColorScattering(vec3 rayOrigin, vec3 rayDir, float tNear, float tFar) {
+	float ta = max(0.0, tNear);
+	float transmittance = 1.0; // T from the camera to the current sample
+	vec3 radiance = vec3(0.0);
+
+	for (float t = ta + u_step_size * 0.5; t <= tFar; t += u_step_size) {
+		vec3 samplePoint = rayOrigin + t * rayDir;
+		float density = sampleDensity(samplePoint);
+		if (density <= 0.0)
+			continue;
+
+		float mu_a = density * u_absortion_coefficient;
+		float mu_s = density * u_scattering_coefficient;
+		float mu_t = mu_a + mu_s; // extinction coefficient (Eq. 2)
+
+		// L_s (Eq. 3): with a single point light the integral over the sphere is just
+		// phase * L_i from the light's direction
+		vec3 lightDir = normalize(u_light_position - samplePoint);
+		vec3 Ls = phaseFunction(dot(rayDir, lightDir)) * lightRadiance(samplePoint);
+
+		// Light emitted and in-scattered here, dimmed by everything between here and the camera
+		radiance += transmittance * (mu_a * u_emitted_color + mu_s * Ls) * u_step_size;
+		transmittance *= exp(-mu_t * u_step_size);
+	}
+
+	return vec4(u_background_color.rgb * transmittance + radiance, u_background_color.a);
+}
+
 void main() {
     vec3 rayOrigin = u_camera_position;
     vec3 rayDir = normalize(v_world_position - u_camera_position);
@@ -208,8 +276,11 @@ void main() {
 	} else if(u_task == 2) {
 		FragColor = computeColorHeterogeneous(rayOrigin, rayDir, t.x, t.y);
 	}
-	else{
+	else if(u_task == 3) {
 		FragColor = computeColorEmissionHeterogeneous(rayOrigin, rayDir, t.x, t.y);
+	}
+	else {
+		FragColor = computeColorScattering(rayOrigin, rayDir, t.x, t.y);
 	}
 }
 

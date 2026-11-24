@@ -70,12 +70,12 @@ WireframeMaterial::~WireframeMaterial() { }
 VolumeMaterial::VolumeMaterial(float ac, glm::vec4& bgcol) : background_color(bgcol) // <-- Vincula la referencia aquí
 {	
 	this->noisefactor = 0.0f;
-	this->Task = 2;
+	this->Task = 3; // Lab 4: start on the full model with scattering
 	this->stepsize = 0.01f;
 	this->absortion_coefficient = ac;
 	this->color = glm::vec4(1.f);
 	this->shader = Shader::Get("res/shaders/basic.vs", "res/shaders/volume_scattering.fs");
-	this->emitedLight = glm::vec3(0.5f, 0.2f, 0.7f);
+	this->emitedLight = glm::vec3(0.0f); // no emission by default (Fig. 1 of Lab 4 has none)
 }
 
 
@@ -113,6 +113,10 @@ void VolumeMaterial::setUniforms(Camera* camera, glm::mat4 model, Mesh* mesh)
 	// Lab 4 Task 1: where the density comes from, and what the shader needs to turn a world
 	// position into texture coordinates (world -> local cube space -> [0,1]^3)
 	this->shader->setUniform("u_density_source", this->densitySource);
+
+	// Lab 4 Task 2: scattering parameters (the light's own uniforms are set in render())
+	this->shader->setUniform("u_scattering_coefficient", this->scattering_coefficient);
+	this->shader->setUniform("u_light_steps", this->lightSteps);
 	this->shader->setUniform("u_inverse_model", glm::inverse(model));
 	this->shader->setUniform("u_local_boxmin", mesh->aabb_min);
 	this->shader->setUniform("u_local_boxmax", mesh->aabb_max);
@@ -267,6 +271,12 @@ void VolumeMaterial::render(Mesh* mesh, glm::mat4 model, Camera* camera)
 		// 2. Llamar a tu función setUniforms pasando los parámetros necesarios
 		setUniforms(camera, model, mesh);
 
+		// Lab 4 Task 2: send the first light of the scene (position, colour, intensity)
+		if (!Application::instance->light_list.empty())
+			Application::instance->light_list[0]->setUniforms(this->shader, model);
+		else
+			this->shader->setUniform("u_light_intensity", 0.f);
+
 		// 3. Realizar la llamada de dibujo (draw call) de la geometría auxiliar (el cubo)
 		mesh->render(GL_TRIANGLES);
 
@@ -284,21 +294,28 @@ void VolumeMaterial::renderInMenu()
 	const char* task_items[] = {
 		"Task 1: Homogeneous Absorption",
 		"Task 2: Heterogeneous Absorption",
-		"Task 3: Emission-Absorption"
+		"Task 3: Emission-Absorption",
+		"Lab 4: Full model (scattering)"
 	};
 
 	// ComboBox de ImGui vinculado a la variable 'task'
-	if (ImGui::Combo("Task Model", &this->Task, task_items, 3)) {
+	if (ImGui::Combo("Task Model", &this->Task, task_items, 4)) {
 		// Opcional: código que se ejecute justo al cambiar de opción
 	}
 
 	// Opcional: Mostrar controles adicionales solo cuando se seleccione la Task 3 (Emisión)
-	if (this->Task == 2) {
+	if (this->Task == 2 || this->Task == 3) {
 
 		ImGui::ColorEdit3("EmitedLight", (float*)&emitedLight);
 	}
 	ImGui::SliderFloat("Step Size", &this->stepsize, 0.001f, 0.2f);
 	ImGui::SliderFloat("Noise Factor", &this->noisefactor, 0.0f, 10.0f);
+
+	// Lab 4 Task 2: scattering controls (the light itself is edited in its own node)
+	if (this->Task == 3) {
+		ImGui::SliderFloat("Scattering coefficient", &this->scattering_coefficient, 0.0f, 40.0f);
+		ImGui::SliderInt("Light ray-march steps", &this->lightSteps, 1, 64);
+	}
 
 	// Lab 4 Task 1: choose where the density comes from (used by the heterogeneous models)
 	const char* source_items[] = { "3D noise", "VDB file" };
