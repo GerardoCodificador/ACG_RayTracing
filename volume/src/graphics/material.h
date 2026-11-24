@@ -9,6 +9,8 @@
 #include "texture.h"
 #include "shader.h"
 
+namespace easyVDB { class OpenVDBReader; }
+
 class Material {
 public:
 
@@ -47,8 +49,17 @@ public:
 	float noisefactor;
 	glm::vec4& background_color;
 	glm::vec3 emitedLight;
+
+	// Lab 4 Task 1: the density comes from 3D noise or from a VDB file stored in this->texture
+	int densitySource = 0;    // 0 = 3D noise, 1 = VDB file
+	int vdbFileIndex = 0;     // file selected in the GUI
+	int loadedVdbIndex = -1;  // file currently in the texture (-1 = none)
+
 	VolumeMaterial(float ac,glm::vec4& bgcol);
 	~VolumeMaterial();
+
+	void loadVDB(std::string file_path);
+	void estimate3DTexture(easyVDB::OpenVDBReader* vdbReader);
 
 	void render(Mesh* mesh, glm::mat4 model, Camera* camera);
 	void renderInMenu();
