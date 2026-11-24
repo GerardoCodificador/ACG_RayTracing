@@ -9,6 +9,8 @@
 #include "texture.h"
 #include "shader.h"
 
+namespace easyVDB { class OpenVDBReader; }
+
 class Material {
 public:
 
@@ -47,8 +49,24 @@ public:
 	float noisefactor;
 	glm::vec4& background_color;
 	glm::vec3 emitedLight;
+
+	// Lab 4 Task 1: the density comes from 3D noise or from a VDB file stored in this->texture
+	int densitySource = 0;    // 0 = 3D noise, 1 = VDB file
+	int vdbFileIndex = 0;     // file selected in the GUI
+	int loadedVdbIndex = -1;  // file currently in the texture (-1 = none)
+
+	// Lab 4 Task 2: in-scattering of light from the scene's light source
+	float scattering_coefficient = 10.0f; // mu_s, scaled by the density like mu_a
+	int lightSteps = 16;                  // steps of the second ray march, towards the light
+
+	// Lab 4 Task 3: Henyey-Greenstein asymmetry, -1 = back-scattering, 0 = isotropic, 1 = forward
+	float g = 0.0f;
+
 	VolumeMaterial(float ac,glm::vec4& bgcol);
 	~VolumeMaterial();
+
+	void loadVDB(std::string file_path);
+	void estimate3DTexture(easyVDB::OpenVDBReader* vdbReader);
 
 	void render(Mesh* mesh, glm::mat4 model, Camera* camera);
 	void renderInMenu();

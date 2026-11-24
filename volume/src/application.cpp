@@ -39,6 +39,12 @@ void Application::init(GLFWwindow* window)
 
     this->node_list.push_back(example);
     this->node_list.push_back(volume);
+
+    // Lab 4 Task 2: a point light for the volume to scatter. It goes in the light list (read by
+    // the volume material) and in the node list (so it is drawn and can be moved in the GUI)
+    Light* light = new Light(glm::vec3(4.0f, 1.8f, 1.0f), 20.f);
+    this->light_list.push_back(light);
+    this->node_list.push_back(light);
 }
 
 void Application::update(float dt)
