@@ -28,6 +28,7 @@ uniform int u_light_steps;
 uniform vec3 u_light_position;
 uniform vec4 u_light_color;
 uniform float u_light_intensity;
+uniform float u_g; // Lab 4 Task 3: Henyey-Greenstein asymmetry
 
 const float PI = 3.14159265359;
 
@@ -205,10 +206,12 @@ vec4 computeColorHeterogeneous(vec3 rayOrigin, vec3 rayDir, float tNear, float t
 // Phase function: how much of the light arriving along the light direction is scattered
 // towards the viewer. cosTheta = dot(rayDir, direction to the light), so cosTheta = 1 means
 // we are looking straight at the light through the volume (forward scattering).
-// Isotropic for now: every direction gets the same share, 1 / (4 pi).
-// TODO (Lab 4 Task 3): replace with Henyey-Greenstein using a g slider.
+// Lab 4 Task 3, Henyey-Greenstein (Eq. 4). g > 0 sends most light onwards (bright when the
+// light is behind the volume), g < 0 sends it back (bright when the light is behind us),
+// g = 0 gives the isotropic 1 / (4 pi). It integrates to 1 over the sphere for any g.
 float phaseFunction(float cosTheta) {
-	return 1.0 / (4.0 * PI);
+	float g2 = u_g * u_g;
+	return (1.0 / (4.0 * PI)) * (1.0 - g2) / pow(1.0 + g2 - 2.0 * u_g * cosTheta, 1.5);
 }
 
 // L_i: the light that reaches point p from the light source, dimmed by the volume between

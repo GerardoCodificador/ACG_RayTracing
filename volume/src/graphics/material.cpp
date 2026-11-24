@@ -117,6 +117,7 @@ void VolumeMaterial::setUniforms(Camera* camera, glm::mat4 model, Mesh* mesh)
 	// Lab 4 Task 2: scattering parameters (the light's own uniforms are set in render())
 	this->shader->setUniform("u_scattering_coefficient", this->scattering_coefficient);
 	this->shader->setUniform("u_light_steps", this->lightSteps);
+	this->shader->setUniform("u_g", this->g);
 	this->shader->setUniform("u_inverse_model", glm::inverse(model));
 	this->shader->setUniform("u_local_boxmin", mesh->aabb_min);
 	this->shader->setUniform("u_local_boxmax", mesh->aabb_max);
@@ -315,6 +316,7 @@ void VolumeMaterial::renderInMenu()
 	if (this->Task == 3) {
 		ImGui::SliderFloat("Scattering coefficient", &this->scattering_coefficient, 0.0f, 40.0f);
 		ImGui::SliderInt("Light ray-march steps", &this->lightSteps, 1, 64);
+		ImGui::SliderFloat("Phase asymmetry g", &this->g, -0.99f, 0.99f); // |g| = 1 would be a delta
 	}
 
 	// Lab 4 Task 1: choose where the density comes from (used by the heterogeneous models)
