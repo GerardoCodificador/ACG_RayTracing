@@ -1,0 +1,16 @@
+[submodule "volume/libraries/easyVDB"]
+	path = volume/libraries/easyVDB
+	url = https://github.com/victorubieto/easyVDB
+	ignore = dirty
+[submodule "volume/libraries/glew-cmake"]
+	path = volume/libraries/glew-cmake
+	url = https://github.com/Perlmint/glew-cmake
+[submodule "volume/libraries/glfw"]
+	path = volume/libraries/glfw
+	url = https://github.com/glfw/glfw
+[submodule "volume/libraries/glm"]
+	path = volume/libraries/glm
+	url = https://github.com/g-truc/glm
+[submodule "volume/libraries/imgui"]
+	path = volume/libraries/imgui
+	url = https://github.com/ocornut/imgui
