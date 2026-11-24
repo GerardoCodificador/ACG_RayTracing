@@ -138,7 +138,7 @@ void VolumeMaterial::renderInMenu()
 	// Opcional: Mostrar controles adicionales solo cuando se seleccione la Task 3 (Emisión)
 	if (this->Task == 2) {
 
-		ImGui::ColorEdit4("EmitedLight", (float*)&emitedLight);
+		ImGui::ColorEdit3("EmitedLight", (float*)&emitedLight);
 	}
 	ImGui::SliderFloat("Step Size", &this->stepsize, 0.001f, 0.2f);
 	ImGui::SliderFloat("Noise Factor", &this->noisefactor, 0.0f, 10.0f);
